@@ -22,11 +22,11 @@ The goals / steps of this project are the following:
 [image1]: ./examples/visualization.jpg "Visualization"
 [image2]: ./examples/grayscale.jpg "Grayscaling"
 [image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
+[image4]: ./new_images/1.png "Traffic Sign 1"
+[image5]: ./new_images/2.png "Traffic Sign 2"
+[image6]: ./new_images/3.png "Traffic Sign 3"
+[image7]: ./new_images/4.png "Traffic Sign 4"
+[image8]: ./new_images/5.png "Traffic Sign 5"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
@@ -45,11 +45,11 @@ You're reading it! and here is a link to my [project code](https://github.com/ud
 I used the pandas library to calculate summary statistics of the traffic
 signs data set:
 
-* The size of training set is ?
-* The size of the validation set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
+* The size of training set is 34799
+* The size of the validation set is 4410
+* The size of test set is 12630
+* The shape of a traffic sign image is (32, 32, 3)
+* The number of unique classes/labels in the data set is 43
 
 #### 2. Include an exploratory visualization of the dataset.
 
@@ -57,30 +57,46 @@ Here is an exploratory visualization of the data set. It is a bar chart showing 
 
 ![alt text][image1]
 
+Min number of images per class = 180
+Max number of images per class = 2010
+
 ### Design and Test a Model Architecture
 
 #### 1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
 
-As a first step, I decided to convert the images to grayscale because ...
+First step i cropped image results image from 32*32 px to 26*26 px, as the original images doesnt cover from edge to edge.
+After that, i made image sharpen, and increase contrast enhance and histogram applied.
+This code can be found in transform_image() function.
 
-Here is an example of a traffic sign image before and after grayscaling.
 
-![alt text][image2]
+All images were processed using transform_image() function, for testing used test.p dataset.
 
-As a last step, I normalized the image data because ...
-
-I decided to generate additional data because ... 
-
-To add more data to the the data set, I used the following techniques because ... 
+Training data also augmented by generating 10 extra images from every image provided.
+Function used for this is augment_image().
+This process includes, constrast enhancement, cropping, sharpening and even rotation by values upto 30%.
 
 Here is an example of an original image and an augmented image:
 
 ![alt text][image3]
 
-The difference between the original data set and the augmented data set is the following ... 
-
 
 #### 2. Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
+
+The CNN architecture is inspired by LeNet.
+Input : Color image of 26*26 px resolution
+Output layer : 43 neurons represents all traffic sign classes.
+
+This CNN includes, 2 inception modules.
+The inception module are alternating with maxpooling layers and included with fc layer with 512 neurons.
+
+The CNN incudes two inception modules which are the same to ones from LeNet, but with two dimension increase convolution 1x1 layers before and after 3x3 and 5x5 convolutions
+
+You can check that functionality in the inception_module function.
+
+The inception modules are developed with maxpooling layers and followed by a fully connected layer with 512 output neurons.
+This layer uses 50% dropout and experiments shown that it really help to decrease overfitting.
+
+The architecture created by process of trial and error using inception modules.
 
 My final model consisted of the following layers:
 
@@ -100,27 +116,31 @@ My final model consisted of the following layers:
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
 
-To train the model, I used an ....
+CNN was trained with Adam optimizer, batch size = 128 images, learning rate = 0.0005.
+First learning rate was 0.0005 with decrease by 20% every 5 epochs. 
+Then this model was trained for 15 epochs.
+
+Variables includes mu = 0.0 and sigma = 0.1
+
+I choose Learning rate by trial and error process.
+
+Traffic sign classes were coded into one-hot encoding.
+At the end of the training process, you can observe the accuracy is saturated and loss has smaller value.
+
+Training log is available in train_log_f.csv
+
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
 My final model results were:
-* training set accuracy of ?
-* validation set accuracy of ? 
-* test set accuracy of ?
+* training set accuracy of 94.6%
 
-If an iterative approach was chosen:
-* What was the first architecture that was tried and why was it chosen?
-* What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to overfitting or underfitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
-* Which parameters were tuned? How were they adjusted and why?
-* What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
+This was purely trail and error procedure.
+But all the steps were taken from the LeNet architecture.
 
-If a well known architecture was chosen:
-* What architecture was chosen?
-* Why did you believe it would be relevant to the traffic sign application?
-* How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
- 
+Convolutional layers were used as this one is common among the image classificaiton systems, as they decrease the computation, compared to the general neural network containing only fully connected layers.
+Inception modules are necessary for good performance.
+
 
 ### Test a Model on New Images
 
@@ -146,7 +166,7 @@ Here are the results of the prediction:
 | Slippery Road			| Slippery Road      							|
 
 
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%.
 
 #### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
@@ -163,7 +183,8 @@ For the first image, the model is relatively sure that this is a stop sign (prob
 | .01				    | Slippery Road      							|
 
 
-For the second image ... 
+tf.nn.top_k will return the values and class ids of the top k predictions. 
+If k=3, for each sign, it'll return the 3 largest probabilities (out of a possible 43) and the respective class ids.
 
 ### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
 #### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
